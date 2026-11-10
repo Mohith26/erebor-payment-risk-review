@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-erebor-color-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payments · Erebor</title>
+<link rel="icon" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="fdic"><b class="fdic__logo">FDIC</b><i>FDIC-Insured&mdash;Backed by the full faith and credit of the U.S. Government.</i></div>
+<div class="frame">
+  <aside class="sidebar">
+    <button class="ws"><span class="ws__av">CR</span><span class="ws__name">Corvid Robotics</span><i class="ph ph-caret-up-down"></i></button>
+    <nav class="nav">
+      <a href="#"><i class="ph ph-house"></i>Home</a>
+      <a href="#"><i class="ph ph-tray"></i>Inbox<span class="badge">3</span></a>
+      <a href="#"><i class="ph ph-arrows-left-right"></i>Transactions</a>
+      <a href="#" class="is-active"><i class="ph ph-paper-plane-tilt"></i>Payments<span class="badge" id="navBadge"></span></a>
+      <a href="#"><i class="ph ph-stack"></i>Accounts</a>
+      <a href="#"><i class="ph ph-users"></i>Contacts</a>
+    </nav>
+    <div class="sidebar__foot">
+      <a href="#" class="navlink"><i class="ph ph-gear-six"></i>Settings</a>
+      <button class="me"><span class="me__av">MC</span><span><b>Maya Chen</b><small>Controller</small></span><i class="ph ph-caret-up"></i></button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="page-head">
+      <h1>Payments</h1>
+      <div class="actions"><button class="btn btn--secondary"><i class="ph ph-download-simple"></i>Export</button><button class="btn btn--brand"><i class="ph ph-plus"></i>Send payment</button></div>
+    </header>
+    <div class="tabs" role="tablist"><button class="tab is-active">Needs approval <span class="count" id="qCount"></span></button><button class="tab">Pending</button><button class="tab">Done</button></div>
+
+    <section class="alert" id="riskAlert"></section>
+
+    <div class="filterbar">
+      <label class="search"><i class="ph ph-magnifying-glass"></i><input placeholder="Search payments" aria-label="Search payments"></label>
+      <button class="chip"><i class="ph ph-calendar-blank"></i>Date</button><button class="chip"><i class="ph ph-funnel"></i>Type</button><button class="chip"><i class="ph ph-user"></i>Contact</button>
+      <button class="chip chip--on" id="riskChip"><i class="ph ph-shield-warning"></i>Risk review</button>
+    </div>
+
+    <div class="table" id="queue"></div>
+    <p class="legal">Unofficial concept demo by Mohith Gajjela. Not affiliated with Erebor. Synthetic data: Corvid Robotics, its payees and payments are fictional.</p>
+  </main>
+  <aside class="blade" id="blade"></aside>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{ "name": "erebor-payment-risk-review", "private": true, "type": "module", "scripts": { "test": "node --test test/*.test.js", "bench": "node scripts/bench.js" } }
