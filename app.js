@@ -66,7 +66,7 @@ function renderQueue() {
       <span class="amt">${usd(p.amount)}</span><span class="td sec">${when(p.ts)}</span>
       <span class="risk">${r.held ? `<span class="tag tag--danger"><i class="ph-fill ph-warning"></i>${oneIn(r.p)}</span>` : `<span class="tag tag--neutral">${r.oneIn < 3 ? 'Typical' : oneIn(r.p)}</span>`}<span class="meter${r.held ? ' is-held' : ''}"><i style="width:${Math.max(4, lvl * 100)}%"></i></span></span></div>`;
   }).join('');
-  if (!state.sel) state.sel = q[0].id;
+  if (!state.sel) { const prior = (p) => D.payments.filter((x) => x.contactId === p.contactId && x.ts < p.ts && x.status === 'done').length; state.sel = (held.find((p) => prior(p) >= 5) || q[0]).id; }
 }
 
 // ---------- blade ----------
