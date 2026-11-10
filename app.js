@@ -53,6 +53,7 @@ const ICON = { amount: 'ph-chart-line-up', timing: 'ph-clock-countdown', duplica
 function renderQueue() {
   const R = state.R; const q = D.queue.map((id) => pay[id]).sort((a, b) => R.scores[a.id].p - R.scores[b.id].p);
   const held = q.filter((p) => R.scores[p.id].held);
+  if (!state.sel) { const prior = (p) => D.payments.filter((x) => x.contactId === p.contactId && x.ts < p.ts && x.status === 'done').length; state.sel = (held.find((p) => prior(p) >= 5) || q[0]).id; }
   $('qCount').textContent = q.length; $('navBadge').textContent = q.length;
   const B = state.B.rules;
   $('riskAlert').innerHTML = `<i class="ph ph-shield-check"></i><div><h3>Risk review <span class="tag tag--new">New</span></h3><p><b>${held.length} of ${q.length}</b> payments waiting for approval look unusual for their payee and are sorted to the top. Tuned so about <b>${Math.round(state.alpha * 100)}%</b> of normal payments get a second look. On your last three months it would have held <b>${B.model.caught} of ${state.B.nAttempts}</b> planted fraud attempts and <b>${B.model.held} of ${state.B.nLegit}</b> normal payments.</p></div><button class="btn btn--secondary" id="openPolicy">Review policy</button>`;
@@ -66,7 +67,7 @@ function renderQueue() {
       <span class="amt">${usd(p.amount)}</span><span class="td sec">${when(p.ts)}</span>
       <span class="risk">${r.held ? `<span class="tag tag--danger"><i class="ph-fill ph-warning"></i>${oneIn(r.p)}</span>` : `<span class="tag tag--neutral">${r.oneIn < 3 ? 'Typical' : oneIn(r.p)}</span>`}<span class="meter${r.held ? ' is-held' : ''}"><i style="width:${Math.max(4, lvl * 100)}%"></i></span></span></div>`;
   }).join('');
-  if (!state.sel) { const prior = (p) => D.payments.filter((x) => x.contactId === p.contactId && x.ts < p.ts && x.status === 'done').length; state.sel = (held.find((p) => prior(p) >= 5) || q[0]).id; }
+
 }
 
 // ---------- blade ----------
@@ -76,7 +77,7 @@ function histChart(p) {
   const W = 420, H = 120, L = 46, Rr = 8, T = 8, Bt = 18; const t0 = Math.min(...ps.map((x) => x.ts)), t1 = p.ts;
   const vals = [...ps.map((x) => x.amount), p.amount]; const lo = Math.log10(Math.min(...vals)) - 0.15, hi = Math.log10(Math.max(...vals)) + 0.15;
   const X = (t) => L + ((t - t0) / Math.max(1, t1 - t0)) * (W - L - Rr); const Y = (v) => T + (1 - (Math.log10(v) - lo) / (hi - lo)) * (H - T - Bt);
-  const ticks = []; for (let e = Math.ceil(lo); e <= Math.floor(hi); e++) ticks.push(10 ** e); if (ticks.length < 2) ticks.push(10 ** ((lo + hi) / 2));
+  let ticks = []; for (let e = Math.floor(lo) - 1; e <= Math.ceil(hi); e++) for (const m of [1, 2, 5]) { const v = m * 10 ** e; if (Math.log10(v) >= lo && Math.log10(v) <= hi) ticks.push(v); } if (ticks.length > 4) ticks = ticks.filter((v, i) => i % Math.ceil(ticks.length / 4) === 0);
   const fmtK = (v) => (v >= 1e6 ? `$${(v / 1e6).toFixed(v >= 1e7 ? 0 : 1)}M` : v >= 1e3 ? `$${Math.round(v / 1e3)}k` : `$${Math.round(v)}`);
   const held = state.R.scores[p.id].held;
   return `<svg class="hist" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
@@ -84,7 +85,7 @@ function histChart(p) {
     <text x="${L}" y="${H - 4}">${MON[et(t0).getUTCMonth()]}</text><text x="${W - Rr}" y="${H - 4}" text-anchor="end">Today</text>
     ${ps.map((x) => `<circle cx="${X(x.ts).toFixed(1)}" cy="${Y(x.amount).toFixed(1)}" r="3" fill="${x.accountId === p.accountId ? '#696762' : '#c2beb2'}"/>`).join('')}
     <circle cx="${X(p.ts)}" cy="${Y(p.amount)}" r="5" fill="${held ? '#be123c' : '#1a1a18'}" stroke="#fff" stroke-width="1.5"/></svg>
-    <p class="quiet">${ps.length} earlier payments to this payee. Dark dots went to the same bank details as this one.</p>`;
+    <p class="quiet">${ps.length} earlier payments to this payee${ps.some((x) => x.accountId === p.accountId) ? '. Dark dots went to the same bank details as this one' : ', none to these bank details'}. ${held ? 'Red' : 'Black'} is this payment.</p>`;
 }
 
 function renderBlade() {
